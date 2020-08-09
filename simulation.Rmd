@@ -1,0 +1,106 @@
+---
+title: "data simulation"
+author: "ss5929"
+date: "7/30/2020"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(tseries)
+library(changepoint)
+
+
+```
+
+# x simulation
+
+$logit(p_{t(j+1)}) = \nu_t + \phi_{1,t}X_{t(j)} + \phi_{2,t}X_{t(j-1)}$
+
+$X_{t(j+1)} \sim bernoulli(logit(p_{t(j+1)}))$
+
+```{r}
+#x = c(rbinom(500,1,6/7),rbinom(800,1,2/7),rbinom(400,1,5/7),rbinom(600,1,3/7),rbinom(700,1,1/7))
+
+# simulate x
+x = NULL
+phi1 = c(1/2,1/20,1/5,1/10000,1/30) #set up phi1
+phi2 = c(1/4,1/30,1/6,1/10500,1/40) #set up phi2
+gama = c(1,-0.9,1,0.000000001,0.0001) #define gama(fixed value)
+num = c(500,800,400,600,700)  # define the number of time points in every period
+x_test_result = NULL
+
+set.seed(3399)
+for(j in 1:5)
+{
+  p.treat = NULL
+  p = NULL
+  a = NULL
+  a[1] = ifelse(j==1,1,ifelse(j==2,0,ifelse(j==3,0,ifelse(j==4,1,ifelse(j==5,0,NULL))))) 
+  a[2] = ifelse(j==1,1,ifelse(j==2,0,ifelse(j==3,1,ifelse(j==4,0,ifelse(j==5,0,NULL))))) # set up the first and second value in each period
+  for(i in 3:num[j])
+  {
+    p[i] = gama[j]+phi1[j]*a[i-1]+phi2[j]*a[i-2]
+    p.treat= exp(p[i])/(1+exp(p[i]))
+    a[i] =sample(rbinom(1000,1,p.treat),size=1)
+
+  }
+  adf = adf.test(a)
+  x_test_result[j] = adf$p.value
+  x=c(x,a)
+
+}
+
+plot(as.ts(x))
+#plot(cpt.mean(x))
+plot(cpt.mean(x,penalty='Manual',pen.value = 2,method='PELT')) 
+
+```
+
+# y simulation
+the range for y(anxiety score) is 0~10
+
+$Y_{t(j+1)} = \alpha_1 X_{t(j+1)} + \alpha_2 X_{t(j)} + \alpha 3 X_{t(j-1)}+ \zeta_t + \varepsilon_{t(j+1)}$
+
+$\zeta_t$ fixed effect for Y
+
+$\varepsilon_{t(j+1)} ~ N(0,\sigma_t^2)$ error term
+
+
+
+```{r}
+#simulate Y
+y = NULL
+alpha1 = 2
+alpha2 = 1
+alpha3 = 0.5
+x_id = 0
+zeta = c(2,2,2,2,2)
+y_test_result = NULL
+
+set.seed(111)
+for(j in 1:5)
+{
+  b=NULL
+  b[1] = ifelse(j==1,2,ifelse(j==2,6,ifelse(j==3,3,ifelse(j==4,5,ifelse(j==5,3,NULL))))) #set up initial values of y for different periods 
+  b[2] = ifelse(j==1,4,ifelse(j==2,5,ifelse(j==3,4,ifelse(j==4,4,ifelse(j==5,2,NULL))))) 
+  zeta = ifelse(j==1,2,ifelse(j==2,2,ifelse(j==3,2,ifelse(j==4,2,ifelse(j==5,2,NULL)))))
+  error_term = rnorm(num[j],0,0.1)
+  for(i in 3:num[j])
+  { 
+    
+    b[i] = alpha1*x[x_id:(x_id+num[j])][i] + alpha2*x[x_id:(x_id+num[j])][i-1] + alpha3*x[x_id:(x_id+num[j])][i-2] + zeta + error_term[i]
+    
+  }
+  x_id = x_id+num[j]
+  adf = adf.test(b)
+  y_test_result[j] = adf$p.value
+  y=c(y,b)
+  
+}
+
+plot(as.ts(y[1:500]))
+
+```
+
+
