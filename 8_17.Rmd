@@ -112,6 +112,9 @@ $$
 Finalliy, report the estimated APTE as the trajectory of pre-defined **contrasts** (e.g. $\hat E(Y^1)-\hat E(Y^0)$). 
 
 
+![](image_2.jpg)
+
+
 # Formula from Linda
 
 Assume that $X_{t(j)}$ precedes $Y_{t(j)}$
