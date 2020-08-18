@@ -49,11 +49,7 @@ Assumptions:
 
 Also, in standard N1RT(n-of-1 randomized trial), only the first treatment is randomized and then held constant for the rest of the period. i.e. $R_{t(0)} = 1$ and $R_{t(j-1)} = 0$ for $j\in (2,...,m_t)$
 
-```{r,warning= FALSE,echo=F, message = FALSE,out.width='80%',fig.show='hold',fig.align='center'}
 
-
-
-```
 
 Therefore, the outcome model is:
 
@@ -91,15 +87,26 @@ The abe(baseline average change in ACBW from $Y_{t-1}^*$) is $E(\triangle_{t(k+1
 
 # Daza (2019) Person as Population:...
 
-First using change point analysis to specify periods, and then transform the exposure into a binary-valued treatment $X_t=1$ or $X_t=0$ for binary exposure. Non-exposure causes can include lagged outcome and exposures.
+First using change point analysis to specify periods t, and then transform the exposure into a binary-valued treatment $X_t=1$ or $X_t=0$ for binary exposure. Non-exposure causes $U$ can include lagged outcome $\bar Y_{t(j)}$ and exposures $\bar X_{t(j)}$.
 
-APTE is a set of contrasts over a period ($E(Y^{a=1})-E(Y^{a=0})$). When $X_t=1$ and $X_{t(j)}=1$, the potential outcome $Y_{t(j)}^{a=1}$ is equal to observed outcome $Y_{t(j)}$. When $X_t=1$ and $X_{t(j)}=0$, the potential outcome $Y_{t(j)}^{a=1}$ is "missing", so we need to predict itconditional on exposure and non-exposure causes by using the model we specified or the model obtained by supervised learning, and vice versa. After this step, we will get time series $Y_t^1$ and $Y_t^0$ for each time period $t$.
+APTE is a set of contrasts over a period ($E(Y^{a=1})-E(Y^{a=0})$). When $X_t=1$ and $X_{t(j)}=1$, the potential outcome $Y_{t(j)}^{a=1}$ is equal to observed outcome $Y_{t(j)}$. When $X_t=1$ and $X_{t(j)}=0$, the potential outcome $Y_{t(j)}^{a=1}$ is "missing", so we need to predict it conditional on exposure and non-exposure causes by using the model we specified or the model obtained by supervised learning, and vice versa. After this step, we will get  $E\left[Y_{t(j+1)}|U_{t(j)},X_{t(j)}=1\right]$ and $E\left[Y_{t(j+1)}|U_{t(j)},X_{t(j)}=0\right]$ for each time period $t$.
 
-Then with predicted potential outcome at some time points and with observed outcome at other time points (should all be potential outcomes, but with consistency assumption, some potential outcomes can be represented by observed outcomes), the weighted average over all non-exposure causes using the g-formula is taken to get the **trajectory of estimated mean POs**, which are $\hat E(Y^1)$ and $\hat E(Y^0)$, for each time period. The weights are derived from the empirical **marginal CSC distribution** as required by the g-formula. 
+For now, we have predicted potential outcome at some time points $Y_{t(j)}^a$ and with observed outcome at other time points $Y_{t(j')}$ (should all be potential outcomes, but with consistency assumption, some potential outcomes can be represented by observed outcomes $Y_{t(j')}^a=\{Y_{t(j')}|X=a\}$). 
+
+
+The weighted average over all non-exposure causes $U$, using the g-formula specified below (1) and (2), is taken to get the **trajectory of estimated mean POs**, which are $\hat E(Y^1)$ and $\hat E(Y^0)$, for each time period. The weights are derived from the empirical **marginal CSC distribution** with marginal distribution $f(U)$ as required by the g-formula. 
+
+With consistency assumption, when $U$ is continuous,
+$$
+E\left[Y^a\right]=E_{U_{t(j)}}\left[E\left[Y_{t(j+1)}|U_{t(j)},X_{t(j)}=a\right]\right]=\int_UE\left[Y_{t(j+1)}|U_{t(j)},X_{t(j)}=a\right]f(U_{t(j)}), \tag{1}
+$$
+
+and when $U$ is discrete,
+$$
+E\left[Y^a\right]=E_{U_{t(j)}}\left[E\left[Y_{t(j+1)}|U_{t(j)},X_{t(j)}=a\right]\right]=\sum_UE\left[Y_{t(j+1)}|U_{t(j)},X_{t(j)}=a\right]p(U_{t(j)}). \tag{2}
+$$
 
 Finalliy, report the estimated APTE as the trajectory of pre-defined **contrasts** (e.g. $\hat E(Y^1)-\hat E(Y^0)$). 
-
-From Table 1 in the article, APTE is calculated at 12 time points.
 
 
 # Formula from Linda
@@ -111,6 +118,7 @@ Assume that $X_{t(j)}$ precedes $Y_{t(j)}$
 $$
 E\left[Y_{t(j)}^{a=X_{t(j)}}\right]-E\left[Y_{t(j)}^{a^*=X_{t(j)}^{*}}\right]
 $$
+
 * Cumulative treatment effect
 
 $$
@@ -130,14 +138,15 @@ $$
 
 The definition and method of APTE estimation are different between Linda and Daza. The APTE mentioned in Daza (2018) is calculated condition on *previous period's exposure being equal to 0* in observed data, and estimate the $\beta_{2k}$ which are the coefficients of exposure at the time point before stable point $k_0$. The final estimated APTE we get is the APTE average across 6 six years. 
 
-The APTE mentioned in Daza (2019) is not conditioned on the previous period's exposure level. Instead, each period is regard as an individual, and then, the weighted POs are estimated with weights derived from the empirical marginal CSC distribution as required by the **g-formula**. Plus, no stability point is mentioned, but the stationarity of confounder or simultaneous cause (CSC) need to be statisfied for the *APTE g-formula estimator* to be consistent for an effect-stable APTE. The final estimated APTE is for each time point (a trajectory of pre-defined contrast), and since each period is seen as an individual and have different length, the length of APTE is decided by the shortest period which is over at least 11 weeks (the analysis results from Daza (2018), saying that "estimated APTE may have been stable between 11 and 17 weeks of high PA").
+The APTE mentioned in Daza (2019) is not conditioned on the previous period's exposure level. Instead, each period is regard as an individual, and then, the weighted POs are estimated with weights derived from the empirical *marginal* CSC distribution as required by the **g-formula**. Plus, no stability point is mentioned, but the stationarity of confounder or simultaneous cause (CSC) need to be statisfied for the *APTE g-formula estimator* to be consistent for an effect-stable APTE. The final estimated APTE is for each time point (a trajectory of pre-defined contrast), and since each period is seen as an individual and have different length, the length of APTE is decided by the shortest period which is over at least 11 weeks (the analysis results from Daza (2018), saying that "estimated APTE may have been stable between 11 and 17 weeks of high PA").
 
 As for Linda's APTE, the effect is considered within the current period (or including some of the the previous period time points if we change the defination of $\bar X_{t(j)}$), which means the Linda's cumulative effect include the *non-exposure causes* that defined in Daza (2019).
 
 
 # Modeling (state space model)
 
-Shu Li (*Estimating heterogeneous treatment effects in nonstationary time series with state-space models*, 2020) proposed a method Causal Transfer to estimate the causal effect in non-stationary time series. Causal Transfer can be used to predict population and sample treatment efect, and we will use the sample version to calculate the $apte_j$ we defined before.
+
+Shu Li (*Estimating heterogeneous treatment effects in nonstationary time series with state-space models*, 2020) proposed a method Causal Transfer to estimate the causal effect in non-stationary time series. Causal Transfer can be used to predict population and sample treatment efect, and we will use the sample version to calculate the $apte_j$ we defined before. [Shu's idea: Sample from the  distribution of outcomes, can we use the distribution of state?]
 
 1. Estimate the unknown parameters with MLE and plug them into the model. 
 
@@ -153,20 +162,92 @@ $$
 
 3. Given the smoothing distribution, we estimate the distribution $N(\tilde a_j,\tilde P_j)$ of the **counterfactuals** with $\tilde a_j=\tilde Z_js_j$ and $\tilde P_j=\tilde Z_jS_j\tilde Z'_j+H_j$. $\tilde Z_j$ is the same as $Z_j$ except for $X_j$ being replaced by $\tilde X_j=|X_j-1|$. 
 
-4. Draw B sets of samples $(\tilde y_t^{(b)})_{b=1}^B$ from $N(\tilde a_j,\tilde P_j)$ to impute the missing outcome (counterfactuals). 
+4. Draw B sets of samples $(\tilde y_j^{(b)})_{b=1}^B$ from $N(\tilde a_j,\tilde P_j)$ to impute the missing outcome (counterfactuals). 
 
-5. The effect would be calcualted by $\hat\tau_t^{(b)}=(\tilde y_t^{(b)}-y_t)(\tilde X_j-X_j)$. 
+5. The effect would be calcualted by $\hat\tau_j^{(b)}=(\tilde y_j^{(b)}-y_j)(\tilde X_j-X_j)$. 
 
-6. Finally, we will get the mean and interval of estimated effects by taking average and percentile of $(\tilde y_t^{(b)})_{b=1}^B$.
-
-
+6. Finally, we will get the mean and interval of estimated effects by taking average and percentile of $(\tilde y_j^{(b)})_{b=1}^B$.
 
 
 
 
 
 
+# Some thoughts:
 
+## state space model and marginal structural mean model
+
+Marginal structural mean model: treatment effect is $\beta_1$.
+
+$$
+\mathrm{E}\left[Y^{X=a} \mid U\right]=\beta_{0}+\beta_{1} X+\beta_{2} U
+$$
+
+State space model: treatment effect is $a_{1,j}$.
+
+$$
+Y_j=\beta_{0}+\beta_{1,j} X_j+\beta_{2,j} U_j
+$$
+
+$$
+\mathrm{E}\left[Y_j^{X=a} \mid U\right]=\beta_{0}+a_{1,j} X_j+a_{2,j} U_j
+$$
+
+
+where, $\beta_{1,j}\sim N(a_{1,j},P_{1,j})$, $\beta_{2,j}\sim N(a_{2,j},P_{2,j})$.
+
+
+
+### State space model in general
+
+Let $\alpha_{t(j)}$ represent the values of the state at time point $t(j)$. The outcome is denoted by a vector $y_{t(j)}$ which is a linear combination of treatment and other covariates $Z_{t(j)}$ with coeffecient matrix $\alpha_{t(j)}$. In time period t the state space model is
+
+$$
+\begin{aligned}
+y_{t(j)}&=Z_{t(j)}\alpha_{t(j)}+\varepsilon_{t(j)}\\
+\alpha_{t+1(j)}&=T_{t(j)}\alpha_{t(j)}+R_{t(j)}\eta_{t(j)}
+\end{aligned}
+$$
+$$
+\tag{4.1}
+$$
+where $\alpha_{t(1)}\sim N(a_{t,1},P_{t,1})$, $\varepsilon_{t(j)}\sim N(0, H_{t(j)})$, and $\eta_{t(j)}\sim N(0, Q_{t(j)})$. Random variation has mean zero and is uncorrelated over time.
+
+Let $Y_{t(j-1)}$ denote the set of past observations $y_{t(1)},...,y_{t(j-1)}$ for $j=2,3...$.
+
+### Kalman filter
+
+The discussion is in a specific time peiod, so for simplicity, we change $t(j)$ to $j$. Let $a_{j|j}=E(\alpha_j|Y_j)$, $a_{j+1}=E(\alpha_{j+1}|Y_j)$, $P_{j|j}=Var(\alpha_j|Y_j)$ and $P_{j+1}=Var(\alpha_{j+1}|Y_j)$. Therefore, the filtering distributions of $\alpha_j$ given $Y_j$ and $\alpha_{j+1}$ given $Y_j$ are given by $N(a_{j|j}, P_{j|j})$ and $N(a_{j+1}, P_{j+1})$ 
+
+The Kalman filter would be 
+
+$$
+\begin{aligned}
+v_j&=y_j-Z_j a_j\;(\text{forecast error})\\
+F_j&=Z_jP_j Z'_j\\
+a_{j|j}&=a_j+P_j Z'_j F_j^{-1}v_j\\
+P_{j|j}&=P_j-P_jZ'_jF_j^{-1}Z_jP_j\\ 
+a_{j+1}&=T_ja_j+K_jv_j\\
+P_{t+1}&=T_jP_j(T_j-K_jZ_j)'+R_jQ_jR'_j
+\end{aligned}
+$$
+
+$$
+\tag{4.2}
+$$
+
+for $t=1,...,m_t$, where *Kalman gain* $K_t=T_tP_tZ'_tF_t^{-1}$. $\alpha_j-a_j$ is state estimations errors.
+
+
+## g-formula and state space model
+
+* The potential outcomes are predicted by state space model rather than using the g-formula. But is there any **similarity or differrence** between those two?
+
+Difference: One's APTE is calculated by the constrast between mean POs, the other one's APTE will be estimated directly by fitting the state space model.
+
+G-formula: $\sum$ {conditional predicted potential outcome} $\times$ {the marginal distribution of non-exposure causes $U$}.
+
+Causal Transfer: $U$ show as an variable in the model, which means the coefficient is already conditional on $U$. So to impute missing potential outcomes, we only need to change $X=a$ to $X=a'$.
 
 
 
