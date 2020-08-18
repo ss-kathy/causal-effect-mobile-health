@@ -2,8 +2,7 @@
 title: "Update by Aug 17"
 author: "mengyu,shuyi"
 date: "8/12/2020"
-output:
-  pdf_document
+output: pdf_document
 
 ---
 # Daza (2018) Causal Analysis of Self-Tracked Time Series Data using a Counterfactual Framework for N-of-1 Trials
