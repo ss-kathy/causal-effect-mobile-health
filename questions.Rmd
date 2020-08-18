@@ -1,0 +1,53 @@
+---
+title: "questions"
+author: "ss5929"
+date: "8/17/2020"
+output: pdf_document
+---
+
+
+1.About the outcome model in Daza(2018):
+$$
+\begin{aligned}
+Y_{t(j+1)}=& \beta_{0}+\left\{1-X_{t(j)}\right\}\left\{X_{t-1(1)}+\left(1-X_{t-1(1)}\right) I\left(m_{t-1}<k_{0}-1\right)\right\} \sum_{k=1}^{k_{0}-1} \beta_{0 k} I(j=k)+\beta_{1} Y_{t(j)}+\\
+&\left[\beta_{2}+\left\{\left(1-X_{t-1(1)}\right)+X_{t-1(1)} I\left(m_{t-1}<k_{0}-1\right)\right\} \sum_{k=1}^{k_{0}-1} \beta_{2 k} I(j=k)+\beta_{3} Y_{t(j)}\right] X_{t(j)}+\mathcal{E}_{t(j)}
+\end{aligned}
+$$
+Daza wrote that $\beta_0 = 0$ if $k_0=k_0^*$ Here $k_0$ means different stability point from 2 to $m_t$ among different time periods and $K_0^*$ means the true stability point. So we are confused why $\beta_0 = 0$ means the stability point chosen is the true stability point.
+
+2.We are confused about the different APTE estmating formula in analysis-1 and analysis-2. In analysis-1, which models change in outcome from the previous outcome, apte is specified as $apte = \sum_{k=1}^{k_0-1} E(\triangle_{t(k+1)}^{Y,1}|x_{t-1(1)}=0,k<k_0) - (k_0-1)E(\triangle_{t(k)}^Y|x_{t-1(1)}=0,k<k_0) = \sum_{k=1}^{k_0-1}\beta_{2k}$. While in analysis-2, which models the change in outcome from the previous period's last outcome or the average of its stable outcomes, APTE is specified as $apte = E(\triangle_{t(k+1)}^1)-E(\triangle_{t(k+1)}^0) = \nu_2+ \nu_3E(\triangle_{t-1}^Y)$.
+
+So why in analysis-2 the estimation of APTE do not need the condition that the previous period is low(i.e, $X_{t-1(1)}=0$)?
+
+3.About the pen-value used in changepoint analysis(**cpt.mean()** function). I find that when pen.value is greater, number of changepoints will decrease and I can always find the pen.value with 4 changepoints finally during the simulation. Therefore, I wonder if there are some restrictions or a normal value/range for this choosing the pen-value?
+
+**Appendix:**
+
+Analysis-1:
+$$
+\begin{aligned}
+\Delta_{t(j+1)}^{Y}=& \beta_{0}+\left\{1-X_{t(j)}\right\}\left\{X_{t-1(1)}+\left(1-X_{t-1(1)}\right) I\left(m_{t-1}<k_{0}-1\right)\right\} \sum_{k=1}^{k_{0}-1} \beta_{0 k} I(j=k)+\beta_{1} \Delta_{t(j)}^{Y}+\\
+&\left[\left\{\left(1-X_{t-1(1)}\right)+X_{t-1(1)} I\left(m_{t-1}<k_{0}-1\right)\right\} \sum_{k=1}^{k_{0}-1} \beta_{2 k} I(j=k)\right] X_{t(j)}+\mathcal{E}_{t(j)}
+\end{aligned}
+$$
+
+Analysis-2
+$$
+\begin{aligned}
+\Delta_{t(j+1)}=& \gamma_{0}+\left\{1-X_{t(j)}\right\}\left\{X_{t-1(1)}+\left(1-X_{t-1(1)}\right) I\left(m_{t-1}<k_{0}-1\right)\right\} \sum_{k=1}^{k_{0}-1} \gamma_{0 k} I(j=k)+\gamma_{1} \Delta_{t-1}^{Y}+\\
+&\left[\gamma_{2}+\left\{\left(1-X_{t-1(1)}\right)+X_{t-1(1)} I\left(m_{t-1}<k_{0}-1\right)\right\} \sum_{k=1}^{k_{0}-1} \gamma_{2 k} I(j=k)+\gamma_{3} \Delta_{t-1}^{Y}\right] X_{t(j)}+\mathcal{E}_{t(j)}
+\end{aligned}
+$$
+
+
+
+
+
+
+
+
+
+
+
+
+

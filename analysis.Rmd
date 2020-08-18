@@ -1,0 +1,75 @@
+---
+title: "analysis"
+author: "mengyu,shuyi"
+date: "8/12/2020"
+output:
+  pdf_document:
+    extra_dependencies: ["bbm", "threeparttable"]
+
+---
+# General procedures
+
+**1.changepoint analysis**
+
+Changepoint analysis here is used to detect the possible period lengths, finding where the mean of an otherwise stationary series changes over time. For each segment, exposure will be defined as high/low if the segment mean is greater/lower than 5/7.
+
+**2.the outcome model**
+
+Assumptions:\
+1. among a treatment level, only from unstable to stable, not destablization again\
+2. $washout\ subperiod \subset stabilization\ subperiod$ for any period\
+3. stability point k0\
+4. dummy variable k<k0 will be included\
+5. current outcome depends on previous outcome and this dependences vary by treatment level
+
+Also, in standard N1RT(n-of-1 randomized trial), only the first treatment is randomized and then held constant for the rest of the period. i.e. $R_{t(0)} = 1$ and $R_{t(j-1)} = 0$ for $j\in (2,...,m_t)$
+
+Therefore, the outcome model is:
+
+```{r,warning= FALSE,echo=F, message = FALSE,out.width='80%',fig.show='hold',fig.align='center'}
+knitr::include_graphics("paper/outcome")
+```
+
+where $k_{stable} = \{k:k_0<k<m_t\}$, $\sum_{k=1}^{k_0-1} \beta_{0k}I(j=k)$ simulate the process if  the time point j is within the unstable period. $I(m_{t-1}<k_0-1)$ simulate the process if the period from 1 to $m_t$ is shorter than $k_0$. 
+
+
+Then, the average baseline effect(i.e.,baseline average ACBW during weeks of low PA) is $E(Y_{t(k+1)}^0) = \beta_0 + \beta_1 E(Y_{t(k)})$ and apte is $E(Y_{t(k+1)}^1)-E(Y_{t(k+1)}^0) = \beta_2 + \beta_3E(Y_{t(K)})$ for $k \in k_{stable}$
+
+
+**3.Post-Hoc analysis:**
+
+1.Analysis1: model the change in outcome from the previous outcome, which is $\triangle_{t(j+1)}^Y = Y_{t(j+1)}-Y_{t(j)}$:
+```{r,warning= FALSE,echo=F, message = FALSE,out.width='80%',fig.show='hold',fig.align='center'}
+knitr::include_graphics("paper/a1")
+```
+
+Then, $apte = \sum_{k=1}^{k_0-1} E(\triangle_{t(k+1)}^{Y,1}|x_{t-1(1)}=0,k<k_0) - (k_0-1)E(\triangle_{t(k)}^Y|x_{t-1(1)}=0,k<k_0) = \sum_{k=1}^{k_0-1}\beta_{2k}$
+
+
+2.Analysis2: model the change in outcome from the preivous period's last outcome or the average of its stable outcomes(when $k_0 > m_{t-1}$), $\triangle_{t(j+1)} = Y_{t(j+1)}-Y_{t-1}^*$ and when $m_{t-1} \leq k_0$, $Y_{t-1}^*$ is the previous last outcome; when $m_{t-1} \geq k_0$, $Y_{t-1}^*$ is the average of its stable outcomes.
+
+The model is:
+```{r,warning= FALSE,echo=F, message = FALSE,out.width='80%',fig.show='hold',fig.align='center'}
+knitr::include_graphics("paper/a2")
+```
+
+The abe(baseline average change in ACBW from $Y_{t-1}^*$) is $E(\triangle_{t(k+1)}^0) = \nu_0 + \nu_1E(\triangle_{t-1}^Y)$ and apte is $E(\triangle_{t(k+1)}^1)-E(\triangle_{t(k+1)}^0) = \nu_2+ \nu_3E(\triangle_{t-1}^Y)$ for $k \in k_{stable}$. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
