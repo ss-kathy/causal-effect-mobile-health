@@ -71,13 +71,13 @@ The abe(baseline average change in ACBW from $Y_{t-1}^*$) is $E(\triangle_{t(k+1
 
 # Daza (2019) Person as Population:...
 
-The way he estimate the APTE in this paper is different. 
+First using change point analysis to specify periods, and then transform the exposure into a binary-valued treatment $X_t=1$ or $X_t=0$ for binary exposure. Non-exposure causes can include lagged outcome and exposures.
 
-* First predict the Potential Outcomes (PO) for each set of observed values (i.e., exposure and other causes) **at each time point**. 
+APTE is a set of contrasts over a period ($E(Y^{a=1})-E(Y^{a=0})$). When $X_t=1$ and $X_{t(j)}=1$, the potential outcome $Y_{t(j)}^{a=1}$ is equal to observed outcome $Y_{t(j)}$. When $X_t=1$ and $X_{t(j)}=0$, the potential outcome $Y_{t(j)}^{a=1}$ is "missing", so we need to predict itconditional on exposure and non-exposure causes by using the model we specified or the model obtained by supervised learning, and vice versa. After this step, we will get time series $Y_t^1$ and $Y_t^0$ for each time period $t$.
 
-* Then take the **weighted average** over all non-exposure causes (lagged outcomes and exposures) at each time point to produce the **trajectory of estimated mean POs** for each exposure level, with weights derived from the empirical marginal CSC distribution as required by the **g-formula**. 
+Then with predicted potential outcome at some time points and with observed outcome at other time points (should all be potential outcomes, but with consistency assumption, some potential outcomes can be represented by observed outcomes), the weighted average over all non-exposure causes using the g-formula is taken to get the **trajectory of estimated mean POs**, which are $\hat E(Y^1)$ and $\hat E(Y^0)$, for each time period. The weights are derived from the empirical **marginal CSC distribution** as required by the g-formula. 
 
-* Report the estimated APTE as the trajectory of pre-defined **contrasts**. If desired, report the naively estimated mean POs and APTE by taking the simple rather than weighted average (i.e., conditional on treatment level at each time point).
+Finalliy, report the estimated APTE as the trajectory of pre-defined **contrasts** (e.g. $\hat E(Y^1)-\hat E(Y^0)$). 
 
 From Table 1 in the article, APTE is calculated at 12 time points.
 
@@ -108,7 +108,7 @@ $$
 
 # The difference among the three ways to calculate the APTE
 
-The definition and method of APTE estimation are different between Linda and Daza. The APTE mentioned in Daza (2018) is calculated condition on *previous period's exposure being equal to 0*, and estimate the $\beta_{2k}$ which are the coefficients of exposure at the time point before stable point $k_0$. The final estimated APTE we get is the APTE average across 6 six years. 
+The definition and method of APTE estimation are different between Linda and Daza. The APTE mentioned in Daza (2018) is calculated condition on *previous period's exposure being equal to 0* in observed data, and estimate the $\beta_{2k}$ which are the coefficients of exposure at the time point before stable point $k_0$. The final estimated APTE we get is the APTE average across 6 six years. 
 
 The APTE mentioned in Daza (2019) is not conditioned on the previous period's exposure level. Instead, each period is regard as an individual, and then, the weighted POs are estimated with weights derived from the empirical marginal CSC distribution as required by the **g-formula**. Plus, no stability point is mentioned, but the stationarity of confounder or simultaneous cause (CSC) need to be statisfied for the *APTE g-formula estimator* to be consistent for an effect-stable APTE. The final estimated APTE is for each time point (a trajectory of pre-defined contrast), and since each period is seen as an individual and have different length, the length of APTE is decided by the shortest period which is over at least 11 weeks (the analysis results from Daza (2018), saying that "estimated APTE may have been stable between 11 and 17 weeks of high PA").
 
