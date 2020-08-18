@@ -44,7 +44,7 @@ The causal effect is defined as the difference in potential outcomes within a pe
 **5.The outcome model**
 
 Assumptions:
-1. among a treatment level, only from unstable to stable, not destablization again\
+1. within a treatment level(or a period), only from unstable to stable(means the effect of treatment on the outcome require a period to stable), not destablization again\
 2. $washout\ subperiod \subset stabilization\ subperiod$ for any period\
 3. stability point k0\
 4. dummy variable k<k0 will be included\
@@ -68,7 +68,9 @@ $$
 
 where $k_{stable} = \{k:k_0<k<m_t\}$ and $k_{unstable} = \{k:0 < k < k_0\}$, all $\beta$ are parameters need to be estimated. $X_{(t-1)(1)}$ means the treatment on previous period's first time point. $\sum_{k=1}^{k_0-1} \beta_{0k}I(j=k)$ simulate the process if  the time point j is within the unstable period. $I(m_{t-1}<k_0-1)$ simulate the process if the period from 1 to $m_t$ is shorter than $k_0$. 
 
-Then, the average baseline effect(i.e.,baseline average ACBW during weeks of low PA) is $E(Y_{t(k+1)}^0) = \beta_0 + \beta_1 E(Y_{t(k)})$ and apte is $E(Y_{t(k+1)}^1)-E(Y_{t(k+1)}^0) = \beta_2 + \beta_3E(Y_{t(K)})$ for $k \in k_{stable}$. Here, Both $\{Y_{t(k+1)}^a\}$ for $a=0/1$ are potential outcomes. One of them are actually observed and the other is the counterfactual.   
+Then, the average baseline effect(i.e.,baseline average ACBW during weeks of low PA) is $E(Y_{t(k+1)}^0) = \beta_0 + \beta_1 E(Y_{t(k)})$ and apte is $E(Y_{t(k+1)}^1)-E(Y_{t(k+1)}^0) = \beta_2 + \beta_3E(Y_{t(K)})$ for $k \in k_{stable}$. Here, Both $\{Y_{t(k+1)}^a\}$ for $a=0/1$ are potential outcomes. One of them are actually observed and the other is the counterfactual but both of them are potential outcomes.
+
+The causal effect definition is described by potential outcomes and estimators are estimated by observed outcome and predicted potential outcomes.  
 
 
 **3.Post-Hoc analysis:**
