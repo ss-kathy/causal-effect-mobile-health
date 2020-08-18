@@ -10,20 +10,32 @@ output:
 
 ## General procedures
 
-**1.design**
+**1.Design**
+
+Raw outcome is per-day average body weight and the constructed is average centered body weight(ACBW) per week(here centered body weight means the difference in body weight from empirical body weight taken over all 6 years).
+
+Raw exposure is engaging in PA on a given day and PA includes multiple kinds of physical activities(running, weight lifting, cycling etc). Constructed exposure is the proportion of days per week when any PA was reported among days when body weight is reported.
+
+The resulting constructed time series consists of 290-293 time points(weeks). Then, changepoint analysis is used to detect the possible period lengths, finding where the mean of an otherwise stationary series changes over time and then partition the series into a sequence of segments. For each segment, PA intensity is defined as high/low if the segment mean is greater/lower than 5/7(i.e, more/less than 5 days of PA per week) 
+
+**2.Notation**
+
+Throughout the article, Daza used the following notations. Random variables and fixed values are written in upper-case and lower-case, respectively. Let $p(A = a)$ denote the probability mass or density of random variable A at a, with shorthand p(a). Let $\{(A)\}$ denote a stochastic process; i.e., a time series of random variables. For any index j, let $\{(j)\}$ denote a sequence. For any random variable B, let $B|A$ denote the event B conditional on A, with shorthand $B|a$ for $B|A = a$. Let $B\perp A$ denote statistical independence of B and A.
+
+Under the setting of APTE, Daza made the following notations. Let$\{(X,Y)\}$ represent a stochastic process. In the basic N1RT, a two-level treatment X is randomized at each time period t, defined as a set of measurement time points. Let t(j) denote a time point within period t for $j=1,...,m_t$. Treatment level is randomized per period only at t(1). We will call a treatment administered in a period consisting of only one time point (i.e., $m_t$ = 1) a point treatment, and write t instead of t(1) in such cases; otherwise, a treatment may be called a period treatment for clarification. 
+
+Since in Daza's case, the effect of $X_t$ on $Y_{t+1}$ is interested in, the pair $\left\{X_{t}, Y_{t+1}\right\}$ will be as an idiographic unit of observation. Let $Y_{t+1}^a$ represent the counterfactual of $Y_{t+1}$ corresponding to $X_t = a$, then the period treatment effect(PTE) will be a contrast between $Y_{t+1}^a$ and $Y_{t+1}^{a'}$ and a contrast between $E(Y_{t+1}^a)$ and $E(Y_{t+1}^{a'})$ is average period treatment effect(APTE). 
+
+**3.Definition of causal effect**
+
+The causal effect is defined as the difference in potential outcomes within a period under different treatment levels.
+
+**4.Assumptions**
 
 
-**2.notation**
-
-**3.definition of causal effect**
-
-**4.assumptions**
 
 
-
-Changepoint analysis here is used to detect the possible period lengths, finding where the mean of an otherwise stationary series changes over time. For each segment, exposure will be defined as high/low if the segment mean is greater/lower than 5/7.
-
-**5.the outcome model**
+**5.The outcome model**
 
 Assumptions:
 1. among a treatment level, only from unstable to stable, not destablization again\
@@ -34,16 +46,22 @@ Assumptions:
 
 Also, in standard N1RT(n-of-1 randomized trial), only the first treatment is randomized and then held constant for the rest of the period. i.e. $R_{t(0)} = 1$ and $R_{t(j-1)} = 0$ for $j\in (2,...,m_t)$
 
+```{r,warning= FALSE,echo=F, message = FALSE,out.width='80%',fig.show='hold',fig.align='center'}
+
+
+
+```
+
 Therefore, the outcome model is:
 
 $$
 \begin{aligned} Y_{t(j+1)}=& \beta_{0}+\left\{1-X_{t(j)}\right\}\left\{X_{t-1(1)}+\left(1-X_{t-1(1)}\right) I\left(m_{t-1}<k_{0}-1\right)\right\} \sum_{k=1}^{k_{0}-1} \beta_{0 k} I(j=k)+\beta_{1} Y_{t(j)}+\\ &\left[\beta_{2}+\left\{\left(1-X_{t-1(1)}\right)+X_{t-1(1)} I\left(m_{t-1}<k_{0}-1\right)\right\} \sum_{k=1}^{k_{0}-1} \beta_{2 k} I(j=k)+\beta_{3} Y_{t(j)}\right] X_{t(j)}+\mathcal{E}_{t(j)} \end{aligned}
 $$
 
-where $k_{stable} = \{k:k_0<k<m_t\}$, $\sum_{k=1}^{k_0-1} \beta_{0k}I(j=k)$ simulate the process if  the time point j is within the unstable period. $I(m_{t-1}<k_0-1)$ simulate the process if the period from 1 to $m_t$ is shorter than $k_0$. 
 
+where $k_{stable} = \{k:k_0<k<m_t\}$ and $k_{unstable} = \{k:0 < k < k_0\}$, all $\beta$ are parameters need to be estimated. $X_{(t-1)(1)}$ means the treatment on previous period's first time point. $\sum_{k=1}^{k_0-1} \beta_{0k}I(j=k)$ simulate the process if  the time point j is within the unstable period. $I(m_{t-1}<k_0-1)$ simulate the process if the period from 1 to $m_t$ is shorter than $k_0$. 
 
-Then, the average baseline effect(i.e.,baseline average ACBW during weeks of low PA) is $E(Y_{t(k+1)}^0) = \beta_0 + \beta_1 E(Y_{t(k)})$ and apte is $E(Y_{t(k+1)}^1)-E(Y_{t(k+1)}^0) = \beta_2 + \beta_3E(Y_{t(K)})$ for $k \in k_{stable}$
+Then, the average baseline effect(i.e.,baseline average ACBW during weeks of low PA) is $E(Y_{t(k+1)}^0) = \beta_0 + \beta_1 E(Y_{t(k)})$ and apte is $E(Y_{t(k+1)}^1)-E(Y_{t(k+1)}^0) = \beta_2 + \beta_3E(Y_{t(K)})$ for $k \in k_{stable}$. Here, Both $\{Y_{t(k+1)}^a\}$ for $a=0/1$ are potential outcomes. One of them are actually observed and the other is the counterfactual.   
 
 
 **3.Post-Hoc analysis:**
