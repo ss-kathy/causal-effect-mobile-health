@@ -52,6 +52,7 @@ Assumptions:
 
 Also, in standard N1RT(n-of-1 randomized trial), only the first treatment is randomized and then held constant for the rest of the period. i.e. $R_{t(0)} = 1$ and $R_{t(j-1)} = 0$ for $j\in (2,...,m_t)$
 
+The plot for illustration is as followed:
 
 
 Therefore, the outcome model is:
